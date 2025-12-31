@@ -1,0 +1,26 @@
+product_id,product_name,category,price
+1,Laptop,Electronics,1026.94
+2,Smartphone,Electronics,641.94
+3,Headphones,Electronics,866.21
+4,Smartwatch,Electronics,1221.77
+5,Camera,Electronics,1290.76
+6,T-Shirt,Apparel,906.62
+7,Jeans,Apparel,1205.94
+8,Jacket,Apparel,444.56
+9,Sneakers,Apparel,1302.14
+10,Dress,Apparel,1316.5
+11,Blender,Home & Kitchen,828.41
+12,Cookware Set,Home & Kitchen,1450.64
+13,Vacuum Cleaner,Home & Kitchen,833.5
+14,Air Purifier,Home & Kitchen,368.61
+15,Coffee Maker,Home & Kitchen,91.54
+16,Shampoo,Beauty & Personal Care,999.52
+17,Skincare Set,Beauty & Personal Care,728.11
+18,Makeup Kit,Beauty & Personal Care,1375.89
+19,Perfume,Beauty & Personal Care,118.99
+20,Body Lotion,Beauty & Personal Care,1271.91
+21,Bicycle,Sports & Outdoors,285.71
+22,Yoga Mat,Sports & Outdoors,638.01
+23,Dumbbells,Sports & Outdoors,384.44
+24,Running Shoes,Sports & Outdoors,799.41
+25,Tennis Racket,Sports & Outdoors,243.63
