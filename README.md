@@ -1,5 +1,7 @@
 # E-Commerce Cart Abandonment Analysis
 
+**By Kyle Czerniawski**
+
 **Dataset used for analysis:** [Kaggle Dataset](https://www.kaggle.com/datasets/dynamo21/cart-abandonment/data)
 
 This repository contains my analysis work done on the dataset linked above. It includes various SQL files (one containing construction of the tables, the others containing analysis pertaining to a specific segment), all datasets used, and a Tableau file containing the dashboard (along with pictures of both the overview dashboard and the demographic-specific dashboard).
