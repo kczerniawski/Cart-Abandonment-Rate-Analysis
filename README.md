@@ -20,9 +20,9 @@ An average cart abandonment rate should be around 70% on most websites. As menti
 
 I posed a couple of questions to be answered:
 
-** What are some common areas of concern found throughout the year that contribute to the overall abandonment rate? **
-** What cities, age groups, and genders contribute the most to the high abandonment rates? **
-** How can we improve these highlighted areas of concern's abandonment rate? **
+**What are some common areas of concern found throughout the year that contribute to the overall abandonment rate?**
+**What cities, age groups, and genders contribute the most to the high abandonment rates?**
+**How can we improve these highlighted areas of concern's abandonment rate?**
 
 The goal for this project is to conduct in-depth analysis of all tables provided (customers, devices, facts, and products) and answer these questions by providing potential solutions. To highlight those areas identified during analysis, a dashboard will be built to convey those concerns, and produce potential solutions to bring the abandonment rate down to where it should be on average.
 
