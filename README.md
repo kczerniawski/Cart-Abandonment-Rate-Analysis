@@ -415,6 +415,7 @@ ORDER BY age_ranges ASC;
 - Both the younger (18-33) and middle generation are behind the heightened apparel abandonment rates, especially in London and Berlin for younger customers, and Berlin and Sydney for the middle-aged customers.
 
 ## 6. Recommendations
+- A great idea is to push a limited-time 10% discount code to the user a certain time after they add an item that is commonly abandoned, or push it based on where the user is signing in from (depending on that city's abandonment rate)
 - To lower product-specific abandonment rates, a buy-one-get-one at a certain percentage off campaign may assist with healing these rates, moreso the quantity-level abandonment rates.
 - For electronics products, display a warranty coverage option on the electronics product pages.
 - In an attempt to prevent revenue loss, targeted e-mails reminding customers about their carts being on the verge of expiring may help. A free shipping discount code sent within the email may tempt the customer to return to their session and complete their checkout.
