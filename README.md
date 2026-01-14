@@ -20,9 +20,9 @@ An average cart abandonment rate should be around 70% on most websites. As menti
 
 I posed a couple of questions to be answered:
 
-- **What are some common areas of concern found throughout the year that contribute to the overall abandonment rate?**
-- **What cities, age groups, and genders contribute the most to the high abandonment rates?**
-- **How can we improve these highlighted areas of concern's abandonment rate?**
+- **What are some key areas of concern found throughout the year that contribute to the overall abandonment rate and revenue lost?**
+- **What demographics contribute the most to the high abandonment rates?**
+- **How can we improve the overall abandonment rate and recover lost revenue?**
 
 The goal for this project is to conduct in-depth analysis of all tables provided (customers, devices, facts, and products) and answer these questions by providing potential solutions. To highlight those areas identified during analysis, a dashboard will be built to convey those concerns, and produce potential solutions to bring the abandonment rate down to where it should be on average.
 
@@ -421,8 +421,18 @@ ORDER BY age_ranges ASC;
 - In an attempt to prevent revenue loss, targeted e-mails reminding customers about their carts being on the verge of expiring may help. A free shipping discount code sent within the email may tempt the customer to return to their session and complete their checkout.
 - For the month of May, especially with May being one month before summer, a marketing campaign involving Sports & Outdoors products would be beneficial for preventing another repeated down month for that category.
 - For the concerns for Fridays, with Fridays typically being pay-day for most people, a limited-time discount for specific products also struggling during those days could bring metrics down to a more sustainable number.
-- For apparel products, easily display size charts on the product page in all size types (US, UK, etc.). With products having all relevant information displayed to them on the page, it would prevent users from having to conduct their own research to see whether a product would fit them or not. 
+- For apparel products, easily display size charts on the product page in all size types (US, UK, etc.). With products having all relevant information displayed to them on the page, it would prevent users from having to conduct their own research to see whether a product would fit them or not.
 
-## 7. Conclusion
+## 7. Tableau Dashboard
+I also constructed a Tableau dashboard to convey my general findings to an audience. The goal of this dashboard was to promote targeted marketing for specific demographics and to highlight areas of concern, including certain customer segments and costly products/categories. In total, there was one filter (Month) and 5 charts/tables built:
+- **Top 8 Revenue Loss Contributors Chart**: To break the data into segments to identify key risk segments regardless of abandonment rates
+- **Top 8 Revenue Lost and Abandonment Rate per Product Bar Graph**: To assess the top products losing revenue due to cart abandonment
+- **Abandonment Rate per Month Line Chart**: To view how the abandonment rate changes by month
+- **Gender-Specific Abandonment Rates by Category Bar Graph**: To identify if gender has an influence on certain categories
+- **Age Range and City Abandonment Rates Heat Map**: To highlight key cells within the matrix that have spiked abandonment rates based on categories or a category
+
+Overall, these five charts along with the metrics attached convey what is needed for a successful dashboard to answer the problem at hand.
+
+## 8. Conclusion
 
 This project was done not just to display my analysis skills within SQL and creativity and storytelling skills using Tableau, but also to be able to understand the thought process behind decision-making with e-commerce stores using KPIs and trends within given data.  Thank you for your support by viewing my project. :-)
