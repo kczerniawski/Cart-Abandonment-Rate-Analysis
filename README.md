@@ -415,13 +415,12 @@ ORDER BY age_ranges ASC;
 - Both the younger (18-33) and middle generation are behind the heightened apparel abandonment rates, especially in London and Berlin for younger customers, and Berlin and Sydney for the middle-aged customers.
 
 ## 6. Recommendations
-- A great idea is to push a limited-time 10% discount code to the user a certain time after they add an item that is commonly abandoned, or push it based on where the user is signing in from (depending on that city's abandonment rate)
-- To lower product-specific abandonment rates, a buy-one-get-one at a certain percentage off campaign may assist with healing these rates, moreso the quantity-level abandonment rates.
-- For electronics products, display a warranty coverage option on the electronics product pages.
-- In an attempt to prevent revenue loss, targeted e-mails reminding customers about their carts being on the verge of expiring may help. A free shipping discount code sent within the email may tempt the customer to return to their session and complete their checkout.
-- For the month of May, especially with May being one month before summer, a marketing campaign involving Sports & Outdoors products would be beneficial for preventing another repeated down month for that category.
-- For the concerns for Fridays, with Fridays typically being pay-day for most people, a limited-time discount for specific products also struggling during those days could bring metrics down to a more sustainable number.
-- For apparel products, easily display size charts on the product page in all size types (US, UK, etc.). With products having all relevant information displayed to them on the page, it would prevent users from having to conduct their own research to see whether a product would fit them or not.
+- Implement automated cart recovery emails within 24 hours of abandonment, with personalized product reminders and potentially a free shipping discount code
+- Consider a buy-one-get-one at a certain percentage off campaign to assist with healing quantity-level abandonment rates
+- Add a more visible warranty/return policy on electronics product pages, especially for items of high value
+- Consider launching a marketing campaign in late spring involving Sports & Outdoors products to prevent another repeated issue with May
+- Showcase size guides for apparel with regional conversions (US, UK, EU), especially for Berlin and London markets where apparel abandonment is elevated
+- Display shipping costs upfront on product pages
 
 ## 7. Tableau Dashboard
 I also constructed a Tableau dashboard to convey my general findings to an audience. The goal of this dashboard was to promote targeted marketing for specific demographics and to highlight areas of concern, including certain customer segments and costly products/categories. In total, there was one filter (Month) and 5 charts/tables built:
