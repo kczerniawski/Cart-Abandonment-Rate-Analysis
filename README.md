@@ -71,295 +71,71 @@ Each point within each section on this README is a query used in its respective 
 - Amount of products per category above 250, 500, and 1000
 
 #### Product Level
-- 
+- Total items added to cart, checked out, and abandoned (including and not including quantity)
+- Top 12 products with the most revenue lost + abandonment rates
+- Top 12 products with the highest abandonment rates
+- Minimum quantity added, maximum, average, and difference (abandoned - checkout) for checkout vs abandonment
+
+#### Category Level
+- Abandonment rate by category
+- Revenue lost by category
 
 ### B. Cart Behavior Analysis
+#### Cart Behavior Analysis
+- Compare revenue made to lost
+- Average cart value for both abandoned and completed carts
+- Compare average cart values
+- Cart value by quantity
 
-- I identified the total amount of revenue lost during the fiscal year strictly due to cart abandonment, which was $6,176,481.95.
-```
-SELECT ROUND(SUM(p.price * f.quantity), 2) as potential_revenue,
-	   ROUND(SUM(CASE WHEN f.abandonment_time IS NULL THEN p.price * f.quantity ELSE 0 END), 2) AS revenue,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN p.price * f.quantity ELSE 0 END), 2) AS lost_revenue,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN p.price * f.quantity ELSE 0 END) / SUM(p.price * f.quantity) * 100, 2) AS revenue_lost_percent
-FROM facts f
-JOIN products p ON f.product_id = p.product_id;
-```
-- I checked the average cart value for abandoned and completed sessions for any discrepancies.
-```
-SELECT 'Completed' as cart_status,
-       ROUND(AVG(p.price * f.quantity), 2) as avg_value
-FROM facts f
-JOIN products p ON f.product_id = p.product_id
-WHERE f.abandonment_time IS NULL
-UNION ALL
-SELECT 'Abandoned' as cart_status,
-       ROUND(AVG(p.price * f.quantity), 2) as avg_value
-FROM facts f
-JOIN products p ON f.product_id = p.product_id
-WHERE f.abandonment_time IS NOT NULL;
-```
-- I grouped sessions into price buckets and compared their abandonment rates along with the difference between abandoned and completed sessions.
-```
-SELECT CASE WHEN p.price * f.quantity < 500 THEN '0-500'
-       WHEN p.price * f.quantity BETWEEN 500 AND 1000 THEN '500-1000'
-       WHEN p.price * f.quantity BETWEEN 1000 AND 2000 THEN '1000-2000'
-       WHEN p.price * f.quantity BETWEEN 2000 AND 3000 THEN '2000-3000'
-       WHEN p.price * f.quantity BETWEEN 3000 AND 4000 THEN '3000-4000'
-       WHEN p.price * f.quantity BETWEEN 4000 AND 5000 THEN '4000-5000'
-       WHEN p.price * f.quantity > 5000 THEN '5000+'
-	   END AS cart_buckets,
-	   ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) AS abandonment_rate,
-	   ROUND(AVG(CASE WHEN f.abandonment_time IS NULL THEN p.price * f.quantity END), 2) as avg_cart_value_completed,
-	   ROUND(AVG(CASE WHEN f.abandonment_time IS NOT NULL THEN p.price * f.quantity END), 2) as avg_cart_value_abandoned
-FROM facts f
-JOIN products p ON f.product_id = p.product_id
-GROUP BY cart_buckets
-ORDER BY MIN(p.price * f.quantity);
-```
-- Similar to what was done in A, I checked this time to see if cart-level quantity was an issue instead of product-level quantity.
-```
-SELECT f.quantity,
-       ROUND(AVG(p.price * f.quantity), 2) as avg_cart_value,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN products p ON f.product_id = p.product_id
-GROUP BY f.quantity
-ORDER BY f.quantity;
-```
-- I then began conducting analysis by time, analyzing cart behavior by day of the week, month, weekday vs weekend, and day of the month. Attached is one query used to assess by month.
-```
-SELECT DATE_FORMAT(d.dates, '%Y-%m') as month,
-       COUNT(*) as total_sessions,
-       SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) as abandoned,
-       SUM(CASE WHEN f.abandonment_time IS NULL THEN 1 ELSE 0 END) as completed,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate,
-       ROUND(AVG(CASE WHEN f.abandonment_time IS NOT NULL THEN p.price * f.quantity END), 2) as avg_abandoned_cart_value,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN p.price * f.quantity ELSE 0 END), 2) as revenue_lost
-FROM facts f
-JOIN dates d ON f.date_id = d.date_id
-JOIN products p ON f.product_id = p.product_id
-WHERE DATE_FORMAT(d.dates, '%Y') = '2023'
-GROUP BY month
-ORDER BY month;
-```
-- The month of May was assessed along with the Sports & Outdoors category in May due to findings found from the query above.
+#### Date Analysis
+- Abandonment + revenue lost by month
+- Abandonment + revenue lost by day of the week
+- Abandonment + revenue lost by weekday/weekend
+- Abandonment + revenue lost by day of the month
 
 ### C. Device Analysis
+#### Device + OS Analysis
+- Abandonment rate by device type
+- Abandonment rate by OS
+- Abandonment rate by device + OS
+- Total lost revenue by device + OS
 
-- Abandonment rates were assessed for device types, OS, and device types running a specific OS. Attached is the query used to assess device types running a specific OS.
-```
-SELECT d.device_type,
-       d.os,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN products p ON f.product_id = p.product_id
-JOIN devices d ON f.device_id = d.device_id
-GROUP BY d.device_type, d.os
-ORDER BY abandonment_rate DESC;
-```
-- I analyzed the abandonment rates for device types with product prices in buckets.
-```
-SELECT d.device_type,
-       CASE WHEN p.price < 250 THEN '$0-$250'
-	   WHEN p.price BETWEEN 250 AND 500 THEN '$250-$500'
-	   WHEN p.price BETWEEN 500 AND 1000 THEN '$500-$1000'
-	   ELSE '$1000+'
-       END as price_range,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN products p ON f.product_id = p.product_id
-JOIN devices d ON f.device_id = d.device_id
-GROUP BY d.device_type, price_range
-ORDER BY d.device_type, 
-		 CASE price_range WHEN '$0-$250' THEN 1
-         WHEN '$250-$500' THEN 2
-         WHEN '$500-$1000' THEN 3
-         WHEN '$1000+' THEN 4 END;
-```
-- I checked for a correlation between device type and quantity.
-```
-SELECT d.device_type,
-       f.quantity,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN devices d ON f.device_id = d.device_id
-GROUP BY d.device_type, f.quantity
-ORDER BY d.device_type, f.quantity;
-```
-- I checked for peaks in abandonment rates by device type per month.
-```
-SELECT DATE_FORMAT(dt.dates, '%Y-%m') as month,
-	   de.device_type,
-       COUNT(*) as total_sessions,
-       SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) as abandoned,
-       SUM(CASE WHEN f.abandonment_time IS NULL THEN 1 ELSE 0 END) as completed,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate,
-       ROUND(AVG(CASE WHEN f.abandonment_time IS NOT NULL THEN p.price * f.quantity END), 2) as avg_abandoned_cart_value,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN p.price * f.quantity ELSE 0 END), 2) as revenue_lost
-FROM facts f
-JOIN dates dt ON f.date_id = dt.date_id
-JOIN devices de ON f.device_id = de.device_id
-JOIN products p ON f.product_id = p.product_id
-WHERE DATE_FORMAT(dt.dates, '%Y') = '2023'
-GROUP BY month, de.device_type
-ORDER BY month;
-```
-- Again, I drilled down in May to see if device types or a specific OS may have contributed to the rate being high.
-```
-SELECT de.device_type,
-       de.os,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN products p ON f.product_id = p.product_id
-JOIN devices de ON f.device_id = de.device_id
-JOIN dates dt ON f.date_id = dt.date_id
-WHERE MONTH(dt.dates) = 5
-GROUP BY de.device_type, de.os
-ORDER BY abandonment_rate DESC;
-```
+#### Device + Category Analysis
+- Each device + OS's top abandoned category and respective abandonment rate
+- Each device + OS's top revenue losing category
+
+#### Device + Cart Behavior Analysis
+- Device type price bucket abandonment rates
+- Device type + quantity abandonment rates
+
+#### Device + Date Analysis
+- Abandonment + revenue lost by month per device
 
 ### D. Demographic Analysis
+#### Age Analysis
+- Abandonment by age buckets
+- Top abandoned categories per age bucket
+- Revenue lost per age bucket
+- Each age bucket's abandonment rate per month
+- Device + age bucket's abandonment rate
 
-- I analyzed abandonment rates by generations to determine if certain ages are abandoning more than others. All customers ages ranged from 18-64, so I was able to split them into 6 parts.
-```
-SELECT CASE WHEN c.age BETWEEN 18 AND 25 THEN '18-25'
-       WHEN c.age BETWEEN 26 AND 33 THEN '26-33'
-       WHEN c.age BETWEEN 34 AND 41 THEN '34-41'
-       WHEN c.age BETWEEN 42 AND 49 THEN '42-49'
-       WHEN c.age BETWEEN 50 AND 57 THEN '50-57'
-       WHEN c.age BETWEEN 58 AND 64 THEN '58-64'
-       END AS age_ranges,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN customers c on f.customer_id = c.customer_id
-GROUP BY age_ranges
-ORDER BY age_ranges;
-```
-- I also checked each age range and the categories they are abandoning the most.
-```
-WITH age_range AS (
-    SELECT
-        CASE
-            WHEN c.age BETWEEN 18 AND 25 THEN '18-25'
-            WHEN c.age BETWEEN 26 AND 33 THEN '26-33'
-            WHEN c.age BETWEEN 34 AND 41 THEN '34-41'
-            WHEN c.age BETWEEN 42 AND 49 THEN '42-49'
-            WHEN c.age BETWEEN 50 AND 57 THEN '50-57'
-            WHEN c.age BETWEEN 58 AND 64 THEN '58-64'
-        END AS age_ranges,
-        p.category,
-        ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-    FROM facts f
-    JOIN customers c ON f.customer_id = c.customer_id
-    JOIN products p ON f.product_id = p.product_id
-    GROUP BY age_ranges, p.category
-),
-categories_ranked AS (
-    SELECT *,
-           ROW_NUMBER() OVER (PARTITION BY age_ranges ORDER BY abandonment_rate DESC) AS rownum
-    FROM age_range
-)
-SELECT age_ranges,
-	   category,
-       abandonment_rate
-FROM categories_ranked
-WHERE rownum = 1
-ORDER BY age_ranges;
-```
-- I drilled down into areas of concern with specific age ranges to determine what exactly is causing the rate to be the way it is for certain products, categories, and the month of May.
-- I assessed the correlation between gender and cart abandonment
-```
-SELECT c.gender,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN customers c ON f.customer_id = c.customer_id
-GROUP BY c.gender
-ORDER BY abandonment_rate DESC;
-```
-- Similarly with categories and gender
-```
-SELECT c.gender,
-       p.category,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f 
-JOIN customers c on f.customer_id = c.customer_id
-JOIN products p on f.product_id = p.product_id
-GROUP BY c.gender, p.category
-ORDER BY c.gender, p.category ASC;
-```
-- I checked for a correlation between age ranges, gender, and cart abandonment rates.
-```
-SELECT CASE WHEN c.age BETWEEN 18 AND 25 THEN '18-25'
-       WHEN c.age BETWEEN 26 AND 33 THEN '26-33'
-       WHEN c.age BETWEEN 34 AND 41 THEN '34-41'
-       WHEN c.age BETWEEN 42 AND 49 THEN '42-49'
-       WHEN c.age BETWEEN 50 AND 57 THEN '50-57'
-       WHEN c.age BETWEEN 58 AND 64 THEN '58-64'
-       END AS age_ranges,
-       c.gender,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f  
-JOIN customers c on f.customer_id = c.customer_id
-GROUP BY age_ranges, c.gender
-ORDER BY age_ranges, c.gender DESC;
-```
-- Moving on, I analyzed city-based rates.
-```
-SELECT c.city,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN customers c ON f.customer_id = c.customer_id
-GROUP BY c.city;
-```
-- Drilling down further, I compared cities x age.
-```
-SELECT CASE WHEN c.age BETWEEN 18 AND 25 THEN '18-25'
-       WHEN c.age BETWEEN 26 AND 33 THEN '26-33'
-       WHEN c.age BETWEEN 34 AND 41 THEN '34-41'
-       WHEN c.age BETWEEN 42 AND 49 THEN '42-49'
-       WHEN c.age BETWEEN 50 AND 57 THEN '50-57'
-       WHEN c.age BETWEEN 58 AND 64 THEN '58-64'
-       END AS age_ranges,
-	   c.city,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f
-JOIN customers c ON f.customer_id = c.customer_id
-GROUP BY age_ranges, c.city
-ORDER BY age_ranges, c.city;
-```
-- I drilled down into certain generations and their related cities as rates were seemingly off for them.
-- I checked to see if first-time users abandoned their carts more or less than returning customers did.
-```
-WITH customer_types AS (
-	SELECT customer_id,
-    date_id,
-    abandonment_time,
-    CASE WHEN f.date_id = (SELECT MIN(f1.date_id) FROM facts f1 WHERE f1.customer_id = f.customer_id) THEN 'New' ELSE 'Returning' END AS type_of_customer
-    FROM facts f
-)
-SELECT type_of_customer, 
-	   COUNT(*) as total_sessions, 
-	   ROUND(SUM(CASE WHEN abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM customer_types
-GROUP BY type_of_customer;
-```
-- Lastly, I compared ages x device types.
-```
-SELECT CASE WHEN c.age BETWEEN 18 AND 25 THEN '18-25'
-       WHEN c.age BETWEEN 26 AND 33 THEN '26-33'
-       WHEN c.age BETWEEN 34 AND 41 THEN '34-41'
-       WHEN c.age BETWEEN 42 AND 49 THEN '42-49'
-       WHEN c.age BETWEEN 50 AND 57 THEN '50-57'
-       WHEN c.age BETWEEN 58 AND 64 THEN '58-64'
-       END AS age_ranges,
-       d.device_type,
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) as abandonment_rate
-FROM facts f 
-JOIN customers c ON f.customer_id = c.customer_id
-JOIN devices d ON f.device_id = d.device_id
-GROUP BY age_ranges, d.device_type
-ORDER BY age_ranges ASC;
-```
+#### Gender Analysis
+- Each gender's abandonment rate
+- Each gender's most abandoned categories
+- Revenue lost per gender
+- Each gender's abandonment rate per device + OS
+
+#### Gender + Age Analysis
+- Age range, gender, and abandonment rates
+
+#### City Analysis
+- Each city's abandonment rate
+- Revenue lost per city
+- Cities, age buckets, and abandonment rates
+
+#### Customer Type Analysis
+- First time vs returning customer abandonment rates
+- First time vs returning customer revenue lost
 
 ## 5. Notable findings
 
