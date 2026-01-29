@@ -60,48 +60,18 @@ Notes:
 
 ## 4. Analysis
 
-### A. Product-specific analysis
+Each point within each section on this README is a query used in its respective file. As mentioned before, all SQL files are attached to this repository.
 
-- Multiple queries were ran to identify basic dataset facts, such as the overall average abandonment rate, total amount of products, total amount of products per category, total amount of items added to cart, checked out, and abandoned (with and without quantity factored in).
-- The difference was taken between the average quantity per product that was in abandoned carts and completed checkouts to identify if product-level quantity was potentially an issue with higher priced products.
-```
-WITH checkout_qty AS (
-	SELECT product_id,
-           MIN(quantity) AS min_checkout,
-		   MAX(quantity) AS max_checkout,
-           ROUND(AVG(quantity), 2) AS avg_checkout
-	FROM facts
-    WHERE abandonment_time IS NULL
-    GROUP BY product_id
-),
-abandon_qty AS (
-	SELECT product_id,
-		   MIN(quantity) AS min_abandon,
-           MAX(quantity) AS max_abandon,
-           ROUND(AVG(quantity), 2) AS avg_abandon
-	FROM facts
-    WHERE abandonment_time IS NOT NULL
-    GROUP BY product_id
-)
-SELECT p.product_name, p.category, p.price, c.min_checkout, c.max_checkout, c.avg_checkout, a.min_abandon, a.max_abandon, a.avg_abandon, ROUND(a.avg_abandon - c.avg_checkout, 2) AS avg_qty_difference
-FROM products p
-LEFT JOIN checkout_qty c ON p.product_id = c.product_id
-LEFT JOIN abandon_qty a ON p.product_id = a.product_id
-ORDER BY avg_qty_difference DESC;
-```
-- Total revenue loss was measured per product to identify how damaging cart abandonment is per product.
-```
-SELECT p.product_name, 
-       p.category, 
-       p.price, 
-       ROUND(SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN 1 ELSE 0 END) / COUNT(*) * 100, 2) AS abandonment_rate,
-       ROUND(p.price * SUM(CASE WHEN f.abandonment_time IS NOT NULL THEN f.quantity ELSE 0 END), 2) AS lost_revenue
-FROM facts f
-JOIN products p ON f.product_id = p.product_id
-GROUP BY p.product_name, p.category, p.price
-ORDER BY lost_revenue DESC;
-```
-- Top abandoned products (Dress and Jacket) along with the top abandoned category (Electronics) were drilled down to identify if quantity had anything to do with abandonment.
+### A. Product and Category Analysis
+#### Basic Dataset Facts
+- Total distinct items sold on the website
+- Total products sold on the website by category
+- Overall abandonment rate
+- Total items added to cart, checked out, and abandoned (including and not including quantity)
+- Amount of products per category above 250, 500, and 1000
+
+#### Product Level
+- 
 
 ### B. Cart Behavior Analysis
 
